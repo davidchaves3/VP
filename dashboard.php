@@ -1,67 +1,89 @@
 <?php
+include "config.php";
+include "includes/log.php";
+
 session_start();
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
 
-include "config.php";
+$usuario_id = $_SESSION['usuario_id'];
+if (!isset($_SESSION['nome'])) {
+    $stmt = $pdo->prepare("SELECT nome FROM usuarios WHERE id = :id");
+    $stmt->execute(['id' => $usuario_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Recupera o departamento do usuário (por exemplo, 'ti')
+    $_SESSION['nome'] = $user ? $user['nome'] : "Usuário Desconhecido";
+}
+
+$nome_usuario = $_SESSION['nome']; 
 $departamento = $_SESSION['departamento'];
 
-/**
- * Função para listar arquivos (documentos) de forma recursiva.
- * Para cada arquivo, cria um link para visualização.
- */
-function listarArquivos($pasta) {
+function listarArquivos($pasta, $processo_nome) {
+    global $usuario_id, $nome_usuario;
+
     if (!is_dir($pasta)) {
-        echo "<p>Nenhum documento disponível em <em>" . htmlspecialchars($pasta) . "</em>.</p>";
+        echo "<p>Nenhum documento disponível.</p>";
         return;
     }
-    
-    $itens = scandir($pasta);
+
+    $arquivos = scandir($pasta);
     echo "<ul>";
-    foreach ($itens as $item) {
-        if ($item != "." && $item != "..") {
-            $caminho = $pasta . "/" . $item;
+    foreach ($arquivos as $arquivo) {
+        if ($arquivo != "." && $arquivo != "..") {
+            $caminho = $pasta . "/" . $arquivo;
+            
             if (is_dir($caminho)) {
-                echo "<li><details><summary>" . htmlspecialchars($item) . "</summary>";
-                listarArquivos($caminho);
+                echo "<li><details><summary>" . htmlspecialchars($arquivo) . "</summary>";
+                listarArquivos($caminho, $processo_nome);
                 echo "</details></li>";
             } else {
-                // Adicionando a classe .file-link e o atributo data-file
-                echo "<li><a href='#' class='file-link' data-file='" . htmlspecialchars($caminho) . "'>" . htmlspecialchars($item) . "</a></li>";
+                // Verifica se o log já foi registrado nesta sessão
+                if (!isset($_SESSION['logs'][$caminho])) {
+                    registrarLog($usuario_id, $nome_usuario, "Visualizou o processo", $processo_nome);
+                    $_SESSION['logs'][$caminho] = true; // Marca como registrado
+                }
+
+                echo "<li>
+                    <a href='$caminho' target='_blank'>$arquivo</a> |
+                    <a href='download.php?file=" . urlencode($caminho) . "'>Download</a>
+                </li>";
             }
         }
     }
     echo "</ul>";
 }
-/**
- * Função para listar os processos (que são pastas) de uma determinada mesa.
- * Cada processo é exibido como um elemento <details> que, ao ser clicado,
- * expande para mostrar os documentos contidos nele.
- */
 function listarProcessos($pasta) {
+    global $usuario_id, $nome_usuario;
+
     if (!is_dir($pasta)) {
-        echo "<p>Nenhum processo disponível em <em>" . htmlspecialchars($pasta) . "</em>.</p>";
+        echo "<p>Nenhum processo disponível.</p>";
         return;
     }
-    
+
     $processos = scandir($pasta);
     echo "<ul>";
     foreach ($processos as $processo) {
         if ($processo != "." && $processo != "..") {
             $caminhoProcesso = $pasta . "/" . $processo;
+            
             if (is_dir($caminhoProcesso)) {
+                // Apenas registra log se ainda não foi registrado nessa sessão
+                if (!isset($_SESSION['logs'][$caminhoProcesso])) {
+                    registrarLog($usuario_id, $nome_usuario, "Acessou o processo", $processo);
+                    $_SESSION['logs'][$caminhoProcesso] = true;
+                }
+
                 echo "<li><details><summary>" . htmlspecialchars($processo) . "</summary>";
-                listarArquivos($caminhoProcesso);
+                listarArquivos($caminhoProcesso, $processo);
                 echo "</details></li>";
             }
         }
     }
     echo "</ul>";
 }
+
 
 // Recupera as mesas atribuídas ao usuário
 $usuario_id = $_SESSION['usuario_id'];
@@ -69,6 +91,7 @@ $stmt = $pdo->prepare("SELECT mesas FROM usuarios WHERE id = :id");
 $stmt->execute(['id' => $usuario_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -116,11 +139,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 <div id="fileModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
-
-    <!-- Área do PDF -->
     <iframe id="fileViewer" src="" frameborder="0"></iframe>
-
-    <!-- Área de Ações no Rodapé -->
     <div class="modal-actions">
       <button id="prevBtn" class="btn-nav">← Documento Anterior</button>
       <a id="downloadBtn" class="btn-download" href="#" download>Download</a>
@@ -128,7 +147,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
   </div>
 </div>
-
 <script src="js/modal.js"></script>
 </body>
 </html>
