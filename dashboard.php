@@ -39,14 +39,14 @@ function listarArquivos($pasta, $processo_nome) {
                 listarArquivos($caminho, $processo_nome);
                 echo "</details></li>";
             } else {
-                // Verifica se o log já foi registrado nesta sessão
-                if (!isset($_SESSION['logs'][$caminho])) {
+                // Garante que logs continuem sendo registrados ao longo do tempo
+                if (!isset($_SESSION['logs'][$caminho]) || time() - $_SESSION['logs'][$caminho] > 30) {
                     registrarLog($usuario_id, $nome_usuario, "Visualizou o processo", $processo_nome);
-                    $_SESSION['logs'][$caminho] = true; // Marca como registrado
+                    $_SESSION['logs'][$caminho] = time(); // Marca o último registro
                 }
 
                 echo "<li>
-                    <a href='$caminho' target='_blank'>$arquivo</a> |
+                    <a href='#' class='file-link' data-file='" . htmlspecialchars($caminho) . "'>" . htmlspecialchars($arquivo) . "</a>
                     <a href='download.php?file=" . urlencode($caminho) . "'>Download</a>
                 </li>";
             }
