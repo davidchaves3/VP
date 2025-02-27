@@ -16,10 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $departamento = $_POST['departamento'];
     $mesas = $_POST['mesas'];
-    // Captura o valor de admin vindo do formulário (radio buttons)
     $admin_status = isset($_POST['admin']) ? $_POST['admin'] : 0;
-    
-    // Se o campo de nova senha for preenchido, atualiza a senha; caso contrário, mantém a senha atual
+
     if (!empty($_POST['senha'])) {
         $senha = $_POST['senha'];
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
@@ -44,16 +42,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'id' => $id
         ]);
     }
-    
-    // Registra log da atividade do administrador (opcional)
-    $admin_id = $_SESSION['usuario_id']; // ID do administrador logado
+
+    // Log de atividade do administrador
+    $admin_id = $_SESSION['usuario_id'];
     $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
     $stmt->execute([
         'admin_id' => $admin_id,
         'acao' => "Editou o usuário com ID $id"
     ]);
-    
+
     $mensagem = "Usuário atualizado com sucesso!";
+}
+
+// Processa a exclusão do usuário
+if (isset($_GET['delete'])) {
+    $delete_id = $_GET['delete'];
+
+    $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id");
+    $stmt->execute(['id' => $delete_id]);
+
+    header("Location: usuarios.php?deleted=true");
+    exit;
 }
 
 // Recupera os dados do usuário para exibição no formulário
@@ -71,12 +80,13 @@ if (!$usuario) {
     <meta charset="UTF-8">
     <title>Editar Usuário - Administração</title>
     <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="../css/admin_nav.css">
-    <link rel="icon" href="img/icone.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../css/delete_modal.css">
+    <script src="../js/script.js" defer></script>
 </head>
 <body>
     <h1>Editar Usuário</h1>
     <?php if(isset($mensagem)) { echo "<p style='color: green; text-align:center;'>$mensagem</p>"; } ?>
+    
     <form method="POST">
         <label>Nome Completo:</label><br>
         <input type="text" name="nome" value="<?= htmlspecialchars($usuario['nome']) ?>" required><br><br>
@@ -98,8 +108,22 @@ if (!$usuario) {
         <label>Nova Senha (deixe em branco para manter a atual):</label><br>
         <input type="password" name="senha"><br><br>
         
-        <button type="submit">Atualizar Usuário</button>
+        <button type="submit" class="btn">Atualizar Usuário</button>
+        <button type="button" class="btn-delete-user" data-id="<?= $id ?>">Excluir Usuário</button>
     </form>
+
+    <!-- Modal de Confirmação para Exclusão -->
+    <div id="confirmModal" class="modal-delete">
+        <div class="modal-delete-content">
+            <span class="close-delete">&times;</span>
+            <p>Tem certeza que deseja excluir este usuário?</p>
+            <div class="modal-delete-actions">
+                <button id="confirmDelete" class="btn-delete">Sim, Excluir</button>
+                <button id="cancelDelete" class="btn-delete btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <p style="text-align:center;"><a href="usuarios.php">Voltar para a Lista de Usuários</a></p>
 </body>
 </html>

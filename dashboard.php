@@ -30,13 +30,13 @@ function listarArquivos($pasta) {
                 listarArquivos($caminho);
                 echo "</details></li>";
             } else {
-                echo "<li><a href='" . htmlspecialchars($caminho) . "' target='_blank'>" . htmlspecialchars($item) . "</a></li>";
+                // Adicionando a classe .file-link e o atributo data-file
+                echo "<li><a href='#' class='file-link' data-file='" . htmlspecialchars($caminho) . "'>" . htmlspecialchars($item) . "</a></li>";
             }
         }
     }
     echo "</ul>";
 }
-
 /**
  * Função para listar os processos (que são pastas) de uma determinada mesa.
  * Cada processo é exibido como um elemento <details> que, ao ser clicado,
@@ -77,6 +77,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="icon" href="img/icone.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
 <body>
     <h1>Bem-vindo ao Portal de Arquivos</h1>
@@ -88,7 +89,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 <li><a href="admin/usuarios.php">Administração</a></li>
                 <li><a href="admin/logs.php">Logs de Atividades</a></li>
             <?php endif; ?>
-            <li><a href="logout.php">Sair</a></li>
+            <li><a href="login.php">Sair</a></li>
         </ul>
     </nav>
     
@@ -111,6 +112,23 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
             }
         ?>
     </section>
-    
+    <!-- Modal para Visualizar Arquivos -->
+<div id="fileModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+
+    <!-- Área do PDF -->
+    <iframe id="fileViewer" src="" frameborder="0"></iframe>
+
+    <!-- Área de Ações no Rodapé -->
+    <div class="modal-actions">
+      <button id="prevBtn" class="btn-nav">← Documento Anterior</button>
+      <a id="downloadBtn" class="btn-download" href="#" download>Download</a>
+      <button id="nextBtn" class="btn-nav">Próximo Documento →</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/modal.js"></script>
 </body>
 </html>

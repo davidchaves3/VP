@@ -48,6 +48,8 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Gestão de Usuários - Administração</title>
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/admin_nav.css">
+    <link rel="stylesheet" href="../css/delete_modal.css">
+
 
 </head>
 <body>
@@ -93,9 +95,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <td><?= htmlspecialchars($usuario['email']) ?></td>
             <td><?= htmlspecialchars($usuario['departamento']) ?></td>
             <td><?= htmlspecialchars($usuario['mesas']) ?></td>
-            <td>
-                <a href="editar_usuario.php?id=<?= $usuario['id'] ?>">Editar</a>
-            </td>
+            <td><a href="editar_usuario.php?id=<?= $usuario['id'] ?>" class="btn-edit">Editar</a></td>
         </tr>
         <?php endforeach; ?>
     </table>

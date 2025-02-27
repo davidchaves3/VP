@@ -1,0 +1,121 @@
+.modal {
+    display: none; /* Mantém o modal oculto até ser ativado pelo clique */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro translúcido */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Estrutura do Modal */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%; 
+    height: 85vh; 
+    max-width: 1200px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content iframe {
+    flex-grow: 1;
+    width: 100%;
+    height: 85vh; /* Aumentamos a altura da visualização */
+    border: none;
+    margin-top: 10px;
+}
+
+/* Animação de entrada do modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Botão de Fechar (X) */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Área de visualização do Arquivo no Modal */
+.modal-content iframe {
+    flex-grow: 1; 
+    width: 100%;
+    height: 100%; 
+    border: none;
+    margin-top: 10px;
+}
+
+/* Área de Ações do Modal */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--secondary-color);
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    position: relative;
+}
+
+/* Botões de Navegação (Anterior e Próximo) */
+.btn-nav {
+    padding: 12px 20px;
+    background-color: var(--primary-color, #5563de);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+}
+
+.btn-nav:hover {
+    background-color: var(--primary-hover, #4455bd);
+}
+
+/* Botão de Download CENTRALIZADO */
+.btn-download {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+}
+
+.btn-download:hover {
+    background-color: #218838;
+}
