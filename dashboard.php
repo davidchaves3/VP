@@ -115,8 +115,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
             <li><a href="login.php">Sair</a></li>
         </ul>
     </nav>
-    
-    <!-- Seção para Processos por Mesa -->
     <section>
     <h2>Processos Atribuídos</h2>
         <?php
