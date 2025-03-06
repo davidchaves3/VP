@@ -15,14 +15,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Guarda os dados do usuário na sessão
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['departamento'] = $usuario['departamento'];
-
+        
             // Verifica se o usuário é administrador
             if (isset($usuario['admin']) && $usuario['admin'] == 1) {
                 $_SESSION['admin'] = true;
             } else {
                 $_SESSION['admin'] = false;
             }
-
+        
+            // Registra o login no log
+            include "includes/log.php"; // Certifica-se de incluir o log
+            registrarLog($usuario['id'], $usuario['nome'], "Realizou login", "Sistema");
+        
             header("Location: dashboard.php");
             exit;
         } else {

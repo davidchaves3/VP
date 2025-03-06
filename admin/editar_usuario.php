@@ -41,15 +41,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'admin' => $admin_status,
             'id' => $id
         ]);
+        
+        // Registra a edição do usuário no log
+        registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário $nome", "Sistema");
+        
     }
 
     // Log de atividade do administrador
-    $admin_id = $_SESSION['usuario_id'];
-    $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
-    $stmt->execute([
-        'admin_id' => $admin_id,
-        'acao' => "Editou o usuário com ID $id"
-    ]);
+    //$admin_id = $_SESSION['usuario_id'];
+    //$stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
+    //$stmt->execute([
+    //    'admin_id' => $admin_id,
+    //    'acao' => "Editou o usuário com ID $id"
+   // ]);
 
     $mensagem = "Usuário atualizado com sucesso!";
 }
