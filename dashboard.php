@@ -39,12 +39,6 @@ function listarArquivos($pasta, $processo_nome) {
                 listarArquivos($caminho, $processo_nome);
                 echo "</details></li>";
             } else {
-                // Garante que logs continuem sendo registrados ao longo do tempo
-                if (!isset($_SESSION['logs'][$caminho]) || time() - $_SESSION['logs'][$caminho] > 30) {
-                    registrarLog($usuario_id, $nome_usuario, "Visualizou o arquivo", $caminho);
-                    $_SESSION['logs'][$caminho] = time(); // Marca o último registro
-                }
-
                 echo "<li>
                 <a href='#' class='file-link' data-file='" . htmlspecialchars($caminho) . "'>" . htmlspecialchars($arquivo) . "</a>
                 <a href='download.php?file=" . urlencode($caminho) . "' class='file-download' data-file='" . htmlspecialchars($caminho) . "'>Download</a>
@@ -70,12 +64,6 @@ function listarProcessos($pasta) {
             $caminhoProcesso = $pasta . "/" . $processo;
             
             if (is_dir($caminhoProcesso)) {
-                // Apenas registra log se ainda não foi registrado nessa sessão
-                if (!isset($_SESSION['logs'][$caminhoProcesso])) {
-                    registrarLog($usuario_id, $nome_usuario, "Acessou o processo", $processo);
-                    $_SESSION['logs'][$caminhoProcesso] = true;
-                }
-
                 echo "<li><details><summary>" . htmlspecialchars($processo) . "</summary>";
                 listarArquivos($caminhoProcesso, $processo);
                 echo "</details></li>";
@@ -84,7 +72,6 @@ function listarProcessos($pasta) {
     }
     echo "</ul>";
 }
-
 
 // Recupera as mesas atribuídas ao usuário
 $usuario_id = $_SESSION['usuario_id'];

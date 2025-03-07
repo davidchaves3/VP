@@ -73,9 +73,6 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </tbody>
         </table>
 
-    <!-- <td id="documento"> -->
-<!-- Paginação no rodapé -->
-<!-- Paginação -->
     <div class="pagination">
         <?php if ($pagina_atual > 1): ?>
             <a href="?pagina=<?= $pagina_atual - 1 ?>" class="page-link">&laquo; Anterior</a>

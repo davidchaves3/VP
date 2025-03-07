@@ -36,6 +36,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 downloadBtn.href = filePath;
                 modal.style.display = "flex"; // Abre o modal corretamente
             }
+            fetch('includes/log.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `acao=Visualizou o arquivo&caminho=${encodeURIComponent(filePath)}`
+            });
         });
     });
 

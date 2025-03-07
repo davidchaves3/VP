@@ -1,30 +1,36 @@
 <?php
-include "db.php"; // Conexão com o banco de dados
+include __DIR__ . "/../config.php";
 
-function registrarLog($usuario_id, $nome_usuario, $acao, $caminho) {
-    global $pdo;
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-    // Extrai corretamente o nome da mesa, situação do processo e nome do processo
-    $partes = explode("/", str_replace("\\", "/", $caminho)); 
-    $total_partes = count($partes);
 
-    if ($total_partes >= 4) {
-        $nome_mesa = $partes[1]; // Nome da mesa
-        $situacao_processo = $partes[2]; // Aberto ou Arquivado
-        $nome_processo = $partes[3]; // Nome do processo real
-    } else {
-        $nome_mesa = "Desconhecido";
-        $situacao_processo = "Desconhecido";
-        $nome_processo = "Desconhecido";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    file_put_contents("log_teste.txt", print_r($_POST, true), FILE_APPEND);
+    // Verifica se os campos necessários estão sendo enviados
+    if (isset($_SESSION['usuario_id'], $_SESSION['nome_usuario'], $_POST['acao'], $_POST['caminho'])) {
+        $usuario_id = $_SESSION['usuario_id'];
+        $nome_usuario = $_SESSION['nome_usuario'];
+        $acao = $_POST['acao'];
+        $caminho = $_POST['caminho'];
+        
+        // Extrai o nome do processo corretamente
+        $partesCaminho = explode('/', $caminho);
+        $processos = isset($partesCaminho[3]) ? $partesCaminho[3] : 'N/D';
+
+        // Prepara a query corretamente com os campos da sua tabela logs
+        $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, nome_usuario, acao, processos, caminho) VALUES (:usuario_id, :nome_usuario, :acao, :processos, :caminho)");
+
+        // Executa a query com segurança usando prepared statements
+        $stmt->execute([
+            ':usuario_id'   => $usuario_id,
+            ':nome_usuario' => $nome_usuario,
+            ':acao'         => $acao,
+            ':processos'    => $processos,
+            ':caminho'      => $caminho
+        ]);
     }
-
-    $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, nome_usuario, acao, data, processos, caminho) VALUES (:usuario_id, :nome_usuario, :acao, NOW(), :processo, :caminho)");
-    $stmt->execute([
-        'usuario_id' => $usuario_id,
-        'nome_usuario' => $nome_usuario,
-        'acao' => $acao,
-        'processo' => $nome_processo,
-        'caminho' => $caminho
-    ]);
-  }
+}
 ?>
