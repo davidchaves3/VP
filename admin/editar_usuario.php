@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ]);
         
         // Registra a edição do usuário no log
-        registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário $nome", "Sistema");
+        //registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário $nome", "Sistema");
         
     }
 
