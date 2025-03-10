@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (filePath) {
                 fileViewer.src = filePath + "#toolbar=0&navpanes=0&scrollbar=0";
                 downloadBtn.href = filePath;
-                modal.style.display = "flex"; // Abre o modal corretamente
+                modal.style.display = "flex"; 
             }
             fetch('includes/log.php', {
                 method: 'POST',

@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Apenas adiciona evento ao botão "Excluir Usuário"
     if (deleteButton) {
         deleteButton.addEventListener("click", function (event) {
-            event.preventDefault(); // Impede comportamento inesperado
+            event.preventDefault(); 
             userIdToDelete = this.getAttribute("data-id");
-            modal.style.display = "flex"; // Exibe o modal apenas quando necessário
+            modal.style.display = "flex"; 
         });
     }
 

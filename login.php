@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
             // Registra o login no log
             include "includes/log.php"; // Certifica-se de incluir o log
-            registrarLog($usuario['id'], $usuario['nome'], "Realizou login", "Sistema");
+            //registrarLog($usuario['id'], $usuario['nome'], "Realizou login", "Sistema");
         
             header("Location: dashboard.php");
             exit;
