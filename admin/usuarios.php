@@ -1,11 +1,9 @@
 <?php
-// admin/usuarios.php
-include "../includes/admin_auth.php";  // Garante que somente administradores possam acessar
+include "../includes/admin_auth.php";  
 include "../includes/admin_nav.php"; 
-
 include "../includes/db.php";
 
-// Processa o formulário de criação de novo usuário (opcional)
+// formulário de criação de novo usuário 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'create') {
     $nome = $_POST['nome'];
     $email = $_POST['email'];
@@ -49,8 +47,6 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/admin_nav.css">
     <link rel="stylesheet" href="../css/delete_modal.css">
-
-
 </head>
 <body>
     <h1>Gestão de Usuários</h1>
@@ -77,7 +73,6 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         <button type="submit">Cadastrar Usuário</button>
     </form>
-    
     <h2>Lista de Usuários</h2>
     <table border="1" cellpadding="5" cellspacing="0">
         <tr>
@@ -99,6 +94,5 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </tr>
         <?php endforeach; ?>
     </table>
-
 </body>
 </html>

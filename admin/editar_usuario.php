@@ -1,6 +1,6 @@
 <?php 
 session_start();
-include "../includes/admin_auth.php";  // Garante que somente administradores possam acessar
+include "../includes/admin_auth.php";  
 include "../includes/db.php";
 
 // Verifica se o ID do usuário a ser editado foi passado via GET
@@ -9,6 +9,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
+
 
 // Processa o formulário de atualização
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -43,31 +44,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ]);
         
         // Registra a edição do usuário no log
-        //registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário $nome", "Sistema");
+        registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário $nome", "Sistema");
         
     }
 
     // Log de atividade do administrador
-    //$admin_id = $_SESSION['usuario_id'];
-    //$stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
-    //$stmt->execute([
-    //    'admin_id' => $admin_id,
-    //    'acao' => "Editou o usuário com ID $id"
-   // ]);
+    $admin_id = $_SESSION['usuario_id'];
+    $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
+    $stmt->execute([
+       'admin_id' => $admin_id,
+       'acao' => "Editou o usuário com ID $id"
+   ]);
 
     $mensagem = "Usuário atualizado com sucesso!";
 }
 
-// Processa a exclusão do usuário
-if (isset($_GET['delete'])) {
-    $delete_id = $_GET['delete'];
+// Recupera o ID corretamente via POST
+if (isset($_POST['excluir'], $_POST['id'])) {
+    $delete_id = $_POST['id'];
 
+    // Exclui o usuário
     $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id");
     $stmt->execute(['id' => $delete_id]);
+
+    // Registrar no log a exclusão
+    include "../includes/log.php";
+    registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Excluiu o usuário com ID $delete_id", '', '');
 
     header("Location: usuarios.php?deleted=true");
     exit;
 }
+
 
 // Recupera os dados do usuário para exibição no formulário
 $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
@@ -112,8 +119,9 @@ if (!$usuario) {
         <label>Nova Senha (deixe em branco para manter a atual):</label><br>
         <input type="password" name="senha"><br><br>
         
-        <button type="submit" class="btn">Atualizar Usuário</button>
-        <button type="button" class="btn-delete-user" data-id="<?= $id ?>">Excluir Usuário</button>
+        <input type="hidden" name="id" value="<?= htmlspecialchars($usuario['id']) ?>">
+        <button type="submit" class="btn-edit">Atualizar Usuário</button>
+        <button type="button" class="btn-delete-user" data-id="<?= htmlspecialchars($usuario['id']) ?>">Excluir Usuário</button>
     </form>
 
     <!-- Modal de Confirmação para Exclusão -->

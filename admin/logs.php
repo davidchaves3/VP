@@ -23,8 +23,6 @@ $stmt->bindValue(":logs_por_pagina", $logs_por_pagina, PDO::PARAM_INT);
 $stmt->execute();
 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
-
 $stmt = $pdo->query("SELECT logs.*, usuarios.nome FROM logs JOIN usuarios ON logs.usuario_id = usuarios.id ORDER BY logs.data DESC");
 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -67,7 +65,7 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <td><?= htmlspecialchars($log['acao']) ?></td>
             <td><?= htmlspecialchars($log['data']) ?></td>
             <td><?= htmlspecialchars($log['processos']) ?></td>
-            <td><?= htmlspecialchars(basename($log['caminho'])) ?></td> <!-- Exibe só o nome do arquivo -->
+            <td><?= htmlspecialchars(basename($log['caminho'])) ?></td> 
         </tr>
         <?php endforeach; ?>
     </tbody>
