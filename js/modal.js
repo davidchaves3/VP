@@ -21,28 +21,46 @@ document.addEventListener("DOMContentLoaded", function() {
         fileArray.push(link.getAttribute("data-file"));
     });
 
-    // Adiciona evento de clique nos documentos
-    fileLinks.forEach(function(link, index) {
-        link.addEventListener("click", function(e) {
-            e.preventDefault();
+// Evento ao clicar no documento
+fileLinks.forEach(function(link, index) {
+    link.addEventListener("click", function(e) {
+        e.preventDefault();
 
-            var filePath = this.getAttribute("data-file");
-            currentIndex = index;
+        var filePath = this.getAttribute("data-file");
+        
+        currentIndex = index;
+        
+        console.log("Abrindo modal para o arquivo:", filePath);
 
-            console.log("Abrindo modal para o arquivo:", filePath);
+        if (filePath) {
+            fileViewer.src = filePath + "#toolbar=0&navpanes=0&scrollbar=0";
+            downloadBtn.href = filePath;
+            modal.style.display = "flex";
 
-            if (filePath) {
-                fileViewer.src = filePath + "#toolbar=0&navpanes=0&scrollbar=0";
-                downloadBtn.href = filePath;
-                modal.style.display = "flex"; 
-            }
+            // CORREÇÃO: Captura corretamente o nome do processo do caminho
+            let partesCaminho = filePath.split('/');
+            let nomeProcesso = partesCaminho[3] || 'Desconhecido';
+
             fetch('includes/log.php', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `acao=Visualizou o arquivo&caminho=${encodeURIComponent(filePath)}`
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'acao=' + encodeURIComponent('Visualizou o arquivo') + 
+                      '&caminho=' + encodeURIComponent(filePath) + 
+                      '&processo=' + encodeURIComponent(nomeProcesso)
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Log registrado:', data);
+            })
+            .catch(error => {
+                console.error('Erro ao registrar log:', error);
             });
-        });
+        }
     });
+});
+
 
     // Função para navegar entre arquivos
     function navigateFile(direction) {
@@ -59,6 +77,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
         fileViewer.src = newFilePath + "#toolbar=0&navpanes=0&scrollbar=0";
         downloadBtn.href = newFilePath;
+        let partesCaminho = newFilePath.split('/');
+        let nomeProcesso = partesCaminho[3] || 'Desconhecido';
+    
+        fetch('includes/log.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'acao=' + encodeURIComponent('Visualizou o arquivo') +
+                  '&caminho=' + encodeURIComponent(newFilePath) +
+                  '&processo=' + encodeURIComponent(nomeProcesso)
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('Log registrado ao navegar:', data);
+        })
+        .catch(error => {
+            console.error('Erro no registro do log ao navegar:', error);
+        });
     }
 
     prevBtn.addEventListener("click", function() {

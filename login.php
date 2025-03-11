@@ -10,28 +10,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute(['email' => $email]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($usuario) {
-        if (password_verify($senha, $usuario['senha'])) {
-            // Guarda os dados do usuário na sessão
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['departamento'] = $usuario['departamento'];
-        
-            // Verifica se o usuário é administrador
-            if (isset($usuario['admin']) && $usuario['admin'] == 1) {
-                $_SESSION['admin'] = true;
-            } else {
-                $_SESSION['admin'] = false;
-            }
-        
-            // Registra o login no log
-            include "includes/log.php"; // Certifica-se de incluir o log
-            //registrarLog($usuario['id'], $usuario['nome'], "Realizou login", "Sistema");
-        
-            header("Location: dashboard.php");
-            exit;
+    if ($usuario && password_verify($senha, $usuario['senha'])) {
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['nome'] = $usuario['nome'];
+        $_SESSION['departamento'] = $usuario['departamento'];
+    
+        if (isset($usuario['admin']) && $usuario['admin'] == 1) {
+            $_SESSION['admin'] = true;
         } else {
-            $erro = "Email ou senha incorretos!";
+            $_SESSION['admin'] = false;
         }
+    
+        include "includes/log.php";
+        registrarLog($usuario['id'], $usuario['nome'], 'Realizou login', '', '');
+    
+        header("Location: dashboard.php");
+        exit;
     } else {
         $erro = "Email ou senha incorretos!";
     }
