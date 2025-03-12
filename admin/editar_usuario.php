@@ -2,81 +2,69 @@
 session_start();
 include "../includes/admin_auth.php";  
 include "../includes/db.php";
+include "../includes/log.php";
 
-// Verifica se o ID do usuário a ser editado foi passado via GET
 if (!isset($_GET['id'])) {
     die("ID do usuário não especificado!");
 }
-
 $id = $_GET['id'];
 
-
-// Processa o formulário de atualização
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nome = $_POST['nome'];
-    $email = $_POST['email'];
-    $departamento = $_POST['departamento'];
-    $mesas = $_POST['mesas'];
-    $admin_status = isset($_POST['admin']) ? $_POST['admin'] : 0;
+    if (isset($_POST['excluir'])) {
+        $delete_id = $_POST['id'];
 
-    if (!empty($_POST['senha'])) {
-        $senha = $_POST['senha'];
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE usuarios SET nome = :nome, email = :email, senha = :senha, departamento = :departamento, mesas = :mesas, admin = :admin WHERE id = :id");
-        $stmt->execute([
-            'nome' => $nome,
-            'email' => $email,
-            'senha' => $senha_hash,
-            'departamento' => $departamento,
-            'mesas' => $mesas,
-            'admin' => $admin_status,
-            'id' => $id
-        ]);
-    } else {
-        $stmt = $pdo->prepare("UPDATE usuarios SET nome = :nome, email = :email, departamento = :departamento, mesas = :mesas, admin = :admin WHERE id = :id");
-        $stmt->execute([
-            'nome' => $nome,
-            'email' => $email,
-            'departamento' => $departamento,
-            'mesas' => $mesas,
-            'admin' => $admin_status,
-            'id' => $id
-        ]);
-        
-        // Registra a edição do usuário no log
-        registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário $nome", "Sistema");
-        
+        $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id");
+        $stmt->execute(['id' => $delete_id]);
+
+        registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Excluiu o usuário com ID $delete_id", '', '');
+
+        header("Location: usuarios.php?deleted=true");
+        exit;
     }
+    else {
+        $nome = $_POST['nome'];
+        $email = $_POST['email'];
+        $departamento = $_POST['departamento'];
+        $mesas = $_POST['mesas'];
+        $admin_status = isset($_POST['admin']) ? $_POST['admin'] : 0;
 
-    // Log de atividade do administrador
-    $admin_id = $_SESSION['usuario_id'];
-    $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
-    $stmt->execute([
-       'admin_id' => $admin_id,
-       'acao' => "Editou o usuário com ID $id"
-   ]);
+        if (!empty($_POST['senha'])) {
+            $senha_hash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("
+                UPDATE usuarios SET nome=:nome, email=:email, senha=:senha, departamento=:departamento, mesas=:mesas, admin=:admin 
+                WHERE id=:id
+            ");
+            $stmt->execute([
+                'nome' => $nome,
+                'email' => $email,
+                'senha' => $senha_hash,
+                'departamento' => $departamento,
+                'mesas' => $mesas,
+                'admin' => $admin_status,
+                'id' => $id
+            ]);
+        } else {
+            $stmt = $pdo->prepare("
+                UPDATE usuarios SET nome=:nome, email=:email, departamento=:departamento, mesas=:mesas, admin=:admin 
+                WHERE id=:id
+            ");
+            $stmt->execute([
+                'nome' => $nome,
+                'email' => $email,
+                'departamento' => $departamento,
+                'mesas' => $mesas,
+                'admin' => $admin_status,
+                'id' => $id
+            ]);
+        }
 
-    $mensagem = "Usuário atualizado com sucesso!";
+        registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Editou o usuário com ID $id", '', '');
+
+        $mensagem = "Usuário atualizado com sucesso!";
+    }
 }
 
-// Recupera o ID corretamente via POST
-if (isset($_POST['excluir'], $_POST['id'])) {
-    $delete_id = $_POST['id'];
-
-    // Exclui o usuário
-    $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = :id");
-    $stmt->execute(['id' => $delete_id]);
-
-    // Registrar no log a exclusão
-    include "../includes/log.php";
-    registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Excluiu o usuário com ID $delete_id", '', '');
-
-    header("Location: usuarios.php?deleted=true");
-    exit;
-}
-
-
-// Recupera os dados do usuário para exibição no formulário
+// Recupera dados do usuário para exibição no formulário
 $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
 $stmt->execute(['id' => $id]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);

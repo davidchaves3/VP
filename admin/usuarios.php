@@ -2,6 +2,7 @@
 include "../includes/admin_auth.php";  
 include "../includes/admin_nav.php"; 
 include "../includes/db.php";
+include "../includes/log.php";
 
 // formulário de criação de novo usuário 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'create') {
@@ -25,12 +26,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     ]);
     
     // Registra log da atividade do administrador
-    $admin_id = $_SESSION['usuario_id']; // ID do administrador logado
-    $stmt = $pdo->prepare("INSERT INTO logs (usuario_id, acao) VALUES (:admin_id, :acao)");
-    $stmt->execute([
-        'admin_id' => $admin_id,
-        'acao' => "Criou o usuário: $nome"
-    ]);
+    $admin_id = $_SESSION['usuario_id']; 
+    registrarLog($_SESSION['usuario_id'], $_SESSION['nome'], "Criou o usuário: $nome", '', '');
     
     $mensagem = "Usuário criado com sucesso!";
 }

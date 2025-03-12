@@ -2,7 +2,10 @@
 include "config.php";
 include "includes/log.php";
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
@@ -95,7 +98,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <!-- Menu de Navegação -->
     <nav>
         <ul>
-            <li><a href="dashboard.php">Dashboard</a></li>
             <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] === true): ?>
                 <li><a href="admin/usuarios.php">Administração</a></li>
                 <li><a href="admin/logs.php">Logs de Atividades</a></li>
@@ -107,7 +109,6 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <h2>Processos Atribuídos</h2>
         <?php
             if ($user && !empty($user['mesas'])) {
-            // Assume que o campo 'mesas' armazena uma lista separada por vírgulas
                     $mesasArray = array_map('trim', explode(',', $user['mesas']));
                     foreach ($mesasArray as $mesa) {
                         // Exibe um cabeçalho para cada mesa
