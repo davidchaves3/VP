@@ -26,7 +26,6 @@ function registrarLog($usuario_id, $nome_usuario, $acao, $processos = '', $camin
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    session_start();
 
     $usuario_id   = $_SESSION['usuario_id'] ?? null;
     $nome_usuario = $_SESSION['nome'] ?? 'Usuário Desconhecido';
@@ -35,5 +34,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $processos    = $_POST['processo'] ?? basename(dirname($caminho));
 
     registrarLog($usuario_id, $nome_usuario, $acao, $processos, $caminho);
-    echo "Registrado com sucesso";
 }

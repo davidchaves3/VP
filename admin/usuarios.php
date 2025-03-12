@@ -4,6 +4,7 @@ include "../includes/admin_nav.php";
 include "../includes/db.php";
 include "../includes/log.php";
 
+
 // formulário de criação de novo usuário 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'create') {
     $nome = $_POST['nome'];
@@ -44,6 +45,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/admin_nav.css">
     <link rel="stylesheet" href="../css/delete_modal.css">
+    <link rel="icon" href="../img/icone.ico" type="image/x-icon">
 </head>
 <body>
     <h1>Gestão de Usuários</h1>

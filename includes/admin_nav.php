@@ -4,7 +4,7 @@
         <ul class="menu">
             <li><a href="usuarios.php">Usuários</a></li>
             <li><a href="logs.php">Logs de Atividades</a></li>
-            <li><a href="../login.php">Sair</a></li>
+            <li><a href="../logout.php">Sair</a></li>
         </ul>
     </div>
 </nav>

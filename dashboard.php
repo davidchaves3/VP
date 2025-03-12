@@ -102,7 +102,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 <li><a href="admin/usuarios.php">Administração</a></li>
                 <li><a href="admin/logs.php">Logs de Atividades</a></li>
             <?php endif; ?>
-            <li><a href="login.php">Sair</a></li>
+            <li><a href="logout.php">Sair</a></li>
         </ul>
     </nav>
     <section>

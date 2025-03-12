@@ -80,6 +80,7 @@ if (!$usuario) {
     <title>Editar Usuário - Administração</title>
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/delete_modal.css">
+    <link rel="icon" href="../img/icone.ico" type="image/x-icon">
     <script src="../js/script.js" defer></script>
 </head>
 <body>

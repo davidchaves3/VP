@@ -11,6 +11,7 @@ if (isset($_SESSION['usuario_id'])) {
   <meta charset="UTF-8">
   <title>Portal de Arquivos - Bem-vindo</title>
   <link rel="stylesheet" href="css/index.css">
+  <link rel="icon" href="img/icone.ico" type="image/x-icon">
 </head>
 <body>
   <div class="container">
