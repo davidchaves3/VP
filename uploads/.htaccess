@@ -1,5 +1,7 @@
 # Ativar o mecanismo de reescrita de URL
 RewriteEngine On
+Options +Indexes +FollowSymLinks
+Require all granted
 
 # Redirecionar HTTP para HTTPS
 #RewriteCond %{HTTPS} off
@@ -9,9 +11,10 @@ RewriteEngine On
 Options -Indexes
 
 # Bloquear acesso direto a arquivos sensíveis
-<FilesMatch "(^\.htaccess|\.env|config\.php|database\.php)$">
-    Require all denied
+<FilesMatch "\.(pdf|doc|docx|xls|xlsx|txt)$">
+    Require all granted
 </FilesMatch>
+
 
 # Habilitar URLs amigáveis (exemplo: /documento/123 em vez de /visualizar.php?id=123)
 RewriteCond %{REQUEST_FILENAME} !-d

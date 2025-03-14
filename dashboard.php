@@ -2,6 +2,7 @@
 include "config.php";
 include "includes/log.php";
 
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -24,7 +25,7 @@ $nome_usuario = $_SESSION['nome'];
 $departamento = $_SESSION['departamento'];
 
 function listarArquivos($pasta, $processo_nome) {
-    global $usuario_id, $nome_usuario;
+    //global $usuario_id, $nome_usuario;
 
     if (!is_dir($pasta)) {
         echo "<p>Nenhum documento disponível.</p>";
@@ -44,7 +45,6 @@ function listarArquivos($pasta, $processo_nome) {
             } else {
                 echo "<li>
                 <a href='#' class='file-link' data-file='" . htmlspecialchars($caminho) . "'>" . htmlspecialchars($arquivo) . "</a>
-                <a href='download.php?file=" . urlencode($caminho) . "' class='file-download' data-file='" . htmlspecialchars($caminho) . "'>Download</a>
             </li>";
             
             }
@@ -53,7 +53,7 @@ function listarArquivos($pasta, $processo_nome) {
     echo "</ul>";
 }
 function listarProcessos($pasta) {
-    global $usuario_id, $nome_usuario;
+    //global $usuario_id, $nome_usuario;
 
     if (!is_dir($pasta)) {
         echo "<p>Nenhum processo disponível.</p>";
@@ -67,7 +67,7 @@ function listarProcessos($pasta) {
             $caminhoProcesso = $pasta . "/" . $processo;
             
             if (is_dir($caminhoProcesso)) {
-                echo "<li><details><summary>" . htmlspecialchars($processo) . "</summary>";
+                echo "<li class='processo-item'><details><summary>" . htmlspecialchars($processo) . "</summary>";
                 listarArquivos($caminhoProcesso, $processo);
                 echo "</details></li>";
             }
@@ -107,6 +107,11 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     </nav>
     <section>
     <h2>Processos Atribuídos</h2>
+    <!-- Barra de Buscar processo -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar processos..." onkeyup="buscarProcesso()">
+        <div id="resultadosBusca"></div>
+    </div>
         <?php
             if ($user && !empty($user['mesas'])) {
                     $mesasArray = array_map('trim', explode(',', $user['mesas']));
@@ -135,5 +140,50 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
   </div>
 </div>
 <script src="js/modal.js"></script>
+<script>
+function buscarProcesso() {
+    var input = document.getElementById("searchInput").value.toLowerCase();
+    var resultadosDiv = document.getElementById("resultadosBusca");
+
+    if (input.length === 0) {
+        resultadosDiv.innerHTML = "";
+        return;
+    }
+
+    fetch("buscar_processos.php?q=" + encodeURIComponent(input))
+        .then(response => response.json())
+        .then(data => {
+            resultadosDiv.innerHTML = "";
+            if (data.length === 0) {
+                resultadosDiv.innerHTML = "<p>Nenhum processo encontrado.</p>";
+            } else {
+                var lista = document.createElement("ul");
+                data.forEach(function(processo) {
+                    var item = document.createElement("li");
+                    var link = document.createElement("a");
+                    
+                    link.href = "#";
+                    link.classList.add("file-link");
+                    link.setAttribute("data-file", processo.caminho);
+                    link.textContent = processo.nome;
+
+                    // Adiciona evento de clique para abrir no modal
+                    link.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        abrirModal(processo.caminho);
+                    });
+
+                    item.appendChild(link);
+                    lista.appendChild(item);
+                });
+                resultadosDiv.appendChild(lista);
+
+            }
+        })
+        .catch(error => console.error("Erro na busca:", error));
+}
+
+</script>
+
 </body>
 </html>

@@ -151,3 +151,35 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+function abrirModal(filePath) {
+    var modal = document.getElementById("fileModal");
+    var fileViewer = document.getElementById("fileViewer");
+    var downloadBtn = document.getElementById("downloadBtn");
+
+    console.log("Abrindo modal para o arquivo:", filePath);
+
+    if (filePath) {
+        fileViewer.src = filePath + "#toolbar=0&navpanes=0&scrollbar=0";
+        downloadBtn.href = filePath;
+        modal.style.display = "flex";
+    }else{
+        console.error("Caminho do arquivo inválido!")
+    }
+
+    // Registra o log do arquivo acessado
+    fetch('includes/log.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'acao=' + encodeURIComponent('Visualizou o arquivo') +
+              '&caminho=' + encodeURIComponent(filePath) +
+              '&processo=' + encodeURIComponent(filePath.split('/')[3] || 'Desconhecido')
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log('Log registrado:', data);
+    })
+    .catch(error => {
+        console.error('Erro ao registrar log:', error);
+    });
+}
+
